@@ -1,0 +1,425 @@
+---
+author: "Lola Manning"
+format: 
+  pdf:
+    include-in-header:
+      text: |
+        \addtokomafont{disposition}{\rmfamily}
+        \usepackage{fancyhdr}
+---
+
+\raggedright
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[L]{Lola Manning}
+\fancyfoot[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\begin{center} \includegraphics[width=0.3\columnwidth]{wm_vertical_single_line_full_color} \end{center}
+
+\begin{center} {\Large Out-of-Pocket Healthcare Expenditure in Relation to Quality of Healthcare\par} \end{center}
+\begin{center} {May 2024} \end{center}
+\ 
+
+\begin{center} {\large \textbf{Executive Summary}\par} \end{center}
+
+- Research investigating the impact of out-of-pocket healthcare costs on healthcare outcomes, as well as the factors influencing these costs.
+- The Global Country Information Data Set 2023 serves as the data set for evaluating these factors, sourced from an annually-updated global information set available on Kaggle, encompassing every country worldwide.
+- Assuming the primary variable, out-of-pocket healthcare expenditure, takes into account all healthcare expenditure, including people with and without insurance.
+- Notable Finding 1: Analysis reveals a negative correlation between patient healthcare expenditure and life expectancy, suggesting that as healthcare expenditure rises, life expectancy tends to decline.
+- Notable Finding 2: Examination of infant and maternal mortality rates in relation to patient healthcare expenditure reveals that as healthcare spending increases, both infant and maternal mortality rates also rise.
+- Notable Finding 3: The analysis of total tax rates in relation to healthcare expenditure indicates that countries with the lowest patient healthcare expenditure tend to have the highest rates of "low" tax rates. This suggests that lower healthcare costs are associated with lower tax burdens.
+- Notable Finding 4: Investigation into the number of physicians per thousand people in relation to patient healthcare expenditure reveals that countries with the lowest healthcare expenditure costs tend to exhibit higher physician-to-population ratios.
+- Notable Finding 5: Analysis of Gross Domestic Product (GDP) in relation to patient healthcare expenditure reveals that countries in the lowest healthcare expenditure brackets exhibit the highest GDP levels.
+- A limitation is that the data for healthcare expenditure variable doesn't take into account if patients have insurance.
+- To enhance the research, an equation could be fitted to the data with healthcare expenditure as the dependent variable.
+
+\newpage
+
+# Overview
+Healthcare is universally recognized as costly; however, often those who need it the most lack access to adequate healthcare. Identifying the shortcomings of the current system lays the foundation for finding a better system. My research aims to evaluate the impact of out-of-pocket healthcare costs on healthcare outcomes and their relationship with factors potentially improving healthcare. The data set facilitates a comparison between out-of-pocket healthcare costs and life expectancy, mortality rates (infant and maternal), as well as physicians per thousand, total tax rates, and GDP. 
+
+1. How do out-of-pocket healthcare costs impact the outcome of health care (life expectancy, mortality rates (infant and maternal))?
+
+2. How are out-of-pocket healthcare costs affected by factors that may improve health care (physicians per thousand, total tax rate, GDP)?
+\ 
+
+# Data Source and Assumptions
+My data set, the "Global Country Information Data Set 2023," is sourced from Kaggle and provided by user Nidula Eligiriyewithana and is compiled from various sources by the data set creator. It is distributed under a Creative Commons International 4.0 License, and is annually updated, with the latest being in August 2023. I consider this data set credible due to its up-to-date data, and through personal cross-verification. For analysis purposes, I assume that out-of-pocket healthcare expenditure encompasses all healthcare spending, regardless of insurance coverage or other factors.
+\ 
+
+# Data Cleaning Process 
+To clean the data, I selected relevant variables, renamed them if necessary, removed extraneous characters like '%' or '$,' and converted all variables to integers. Null values were removed. New variables were created to categorize entries of Health_expenditure_%, Total_Tax_Rate_%, and Physicians_per_Thousand into "Low", "Mid", and "High" for visualization purposes.
+
+During exploratory data analysis (EDA), a negative linear relationship between out-of-pocket healthcare expenditure and life expectancy emerged, suggesting increased expenditure does not tend to improve health outcomes. Further analysis revealed a slightly negative correlation between physicians per thousand and healthcare expenditure, indicating factors improving healthcare may not increase patient costs.
+\ 
+
+# Notable Findings
+
+***Finding 1.*** The first notable observation pertains to the relationship between healthcare expenditure and life expectancy. Figure 1 and Table 1 show that lower life expectancies, on average, seem to correspond with higher healthcare costs. This may suggests that countries with higher healthcare expenses typically have lower healthcare quality. See Figure 1 and Table 1
+
+***Finding 2.*** The second finding explores infant and maternal mortality rates in relation to healthcare expenditure. Infant mortality rates are deaths per 1,000 children born. Maternal mortality rates are deaths per 100,000 births. A positive correlation is observed and Table 2 sees a rising mean value for both as health expenditure increases, suggesting that countries with higher out-of-pocket expenses experience more deaths associated with childbirth. See Figures 2 and Table 2
+
+***Finding 3.*** The third observation examines the relationship between total tax rate and out-of-pocket healthcare expenses. In Figure 3, the "High" tax rate category constitutes the highest percentage of the "High" healthcare expenditure category. In Table 3, a rising mean is seen as healthcare percentage increases. This indicates a link between high taxation and elevated out-of-pocket healthcare costs. See Figures 3 and Table 3
+
+***Finding 4.*** The fourth finding examines the correlation between the number of physicians per 1,000 people and patient healthcare expenditure. In Figure 4, 54% of countries with a high density of physicians fall into the "Low" category for healthcare expenditure, compared to 33% in the "Mid" category and 13% in the "High" category. In Table 4, mean healthcare expenditure decreases as physicians increase. See Figures 4 and Table 4
+
+***Finding 5.*** 
+The fifth finding links a country's GDP with out-of-pocket healthcare expenditure. As seen in Figure 5.1 and Table 5, lower out-of-pocket expenses correspond to higher GDP's. This suggests that individuals in less affluent countries may face a larger burden of healthcare costs. Notably, high GDP outliers often fall within low to mid healthcare expense brackets. See Figures 5 and Table 5 
+\ 
+
+# Limitations
+A limitation of the primary variable, out-of-pocket healthcare expenditure, is lack of information regarding if there are national healthcare systems and whether the data includes both insured and uninsured individuals. This omission overlooks a crucial aspect of healthcare accessibility and equity across a population. Additional data on this issue would allow for an important disparity to be examined.
+Additionally, a limitation in the research regards lack of combination of the independent variables. To enhance this project, an equation could be fit to the data with healthcare expenditure as the dependent variable. This would allow for examination of interacting factors.
+\newpage 
+
+
+# Data Visualizations and Tables
+
+```{r include=FALSE}
+#load packages
+options(warn = -1) #suppress warnings
+
+suppressWarnings({ #suppress warnings
+  library(readr)
+  library(dplyr)
+  library(stringr)
+  library(psych)
+  library(plotly)
+  library(ggplot2)
+  library(gridExtra)
+  library(kableExtra)
+  library(DT)
+  library(formattable)
+  library(janitor)
+  library(tidyverse)
+})
+```
+
+```{r include=FALSE}
+
+#Read in data...
+world_data_2023 <- read_csv("~/Downloads/world-data-2023.csv")
+```
+
+```{r select columns, echo=FALSE}
+#selecting variables to keep
+subset_wd <- world_data_2023[c("Country", "Out of pocket health expenditure", "Birth Rate", "Fertility Rate", "GDP", "Gross primary education enrollment (%)","Gross tertiary education enrollment (%)", "Infant mortality", "Life expectancy", "Maternal mortality ratio", "Minimum wage", "Physicians per thousand", "Total tax rate", "Official language", "Urban_population", "Population")]
+```
+
+```{r change names, echo=FALSE}
+#changing their names to be easier to work with
+names(subset_wd) <- c("Country", "Health_expenditure_%", "Birth_Rate", "Fertility_Rate", "GDP_in_$", "Primary_Ed_Enrollment_%", "Tertiary_Ed_Enrollment_%", "Infant_Mortality_Ratio", "Life_Expectancy", "Maternal_Mortality_Ratio", "Minimum_Wage_in_$", "Physicians_per_Thousand", "Total_Tax_Rate_%","Language", "Urban_Pop", "Population")
+```
+
+
+```{r remove %, echo=FALSE}
+#remove % from data
+columns_to_convert <- c("Health_expenditure_%", "Primary_Ed_Enrollment_%", "Tertiary_Ed_Enrollment_%", "Total_Tax_Rate_%")
+
+# Iterate through each specified column
+for (col in columns_to_convert) {
+# Remove percentage sign from column values and convert to numeric
+  subset_wd[[col]] <- as.numeric(gsub("%", "", subset_wd[[col]]))
+}
+```
+
+```{r remove $, echo=FALSE}
+#choose columns to remove $ from
+columns_to_convert <- c("GDP_in_$", "Minimum_Wage_in_$")
+
+# Loop through columns and convert to numeric format
+for (col in columns_to_convert) {
+  # Remove dollar sign and commas from column values
+  subset_wd[[col]] <- as.numeric(gsub("[\\$,]", "", subset_wd[[col]]))
+}
+```
+
+```{r convert to integer, echo=FALSE}
+#choose columns to convert to integer
+columns_to_convert <- c("Health_expenditure_%", "Birth_Rate", "Fertility_Rate", "Primary_Ed_Enrollment_%", "Tertiary_Ed_Enrollment_%", "Infant_Mortality_Ratio", "Life_Expectancy", "Maternal_Mortality_Ratio", "Minimum_Wage_in_$", "Physicians_per_Thousand", "Total_Tax_Rate_%")
+
+convert_to_integer <- function(vec) {
+  # Convert only if the value is numeric
+  ifelse(grepl("^\\d+$", vec), as.integer(vec), vec)
+}
+
+# Iterate through each column of the dataframe and apply the conversion function
+subset_wd[columns_to_convert] <- lapply(subset_wd[columns_to_convert], convert_to_integer)
+```
+
+
+```{r add groupings for some visualizations part 1, echo=FALSE}
+#add breaks and labels 
+breaks <- c(0, 30, 60, 100)  # Ranges: <30, 30-60, >60
+labels <- c("Low", "Mid", "High") #make labels
+
+subset_wd$`HHE%_Groups` <- cut(subset_wd$`Health_expenditure_%`, breaks = breaks, labels = labels, include.lowest = TRUE) #create new column with categories
+```
+
+
+```{r add groupings for some visualizations part 2, echo=FALSE}
+#group total tax rate 
+
+# Calculate quartiles for total tax rate
+quartiles <- quantile(subset_wd$`Total_Tax_Rate_%`, probs = c(0, 0.30, 0.60, 1), na.rm = TRUE)
+# Create labels for each quartile
+labels <- c("Low", "Mid", "High")
+# Create a new column with quartile labels
+subset_wd$`TTR%_Quartiles` <- cut(subset_wd$`Total_Tax_Rate_%`, breaks = quartiles, labels = labels, include.lowest = TRUE)
+```
+
+```{r add groupings for some visualizations, echo=FALSE}
+#group physicians per thousand
+
+# Calculate quartiles for total tax rate
+quartiles <- quantile(subset_wd$Physicians_per_Thousand, probs = c(0, 0.30, 0.60, 1), na.rm = TRUE)
+# Create labels for each quartile
+labels <- c("Low", "Mid", "High")
+# Create a new column with quartile labels
+subset_wd$PPT_Quartiles <- cut(subset_wd$Physicians_per_Thousand, breaks = quartiles, labels = labels, include.lowest = TRUE)
+```
+
+```{r na omit, echo=FALSE}
+subset_wd = na.omit(subset_wd) #get ride of NAs
+```
+
+
+## Figure 1. How Out-of-Pocket Healthcare Expenditure Impacts Life Expectancy
+```{r v1, echo=FALSE}
+ggplot(subset_wd, aes(x = `Health_expenditure_%`, y = Life_Expectancy)) + #scatterplot
+  geom_point(shape = 21, color = "blue", fill = "gold") + #add colors
+  geom_smooth(method = "lm", formula = y~x, se = FALSE, #make lm trend line
+              color = "red", linetype = "dashed") +
+  #add labels
+  labs(x = "Out-of-Pocket Healthcare Expenditure %",
+       y = "Life Expectancy in Years")
+```
+
+## Table 1. Out-of-Pocket Healthcare Expenditure and Life Expectancy
+
+```{r t1, echo=FALSE}
+# Subset the necessary columns from your dataset
+exp_v_life <- subset_wd[, c("Country", "Health_expenditure_%", "Life_Expectancy")]
+
+# Create groups based on ranges of 10 between the minimum and maximum values
+exp_v_life <- exp_v_life %>%
+  mutate(Health_expenditure_group = cut(`Health_expenditure_%`, 
+                                        breaks = seq(0, 100, by = 10),
+                                        labels = sprintf("%s%% - %s%%", seq(0, 90, by = 10), seq(10, 100, by = 10)))) 
+
+# Calculate the mean life expectancy for each group
+exp_v_life_mean <- exp_v_life %>%
+  group_by(Health_expenditure_group) %>%
+  summarise(mean_life_expectancy = mean(Life_Expectancy, na.rm = TRUE))
+
+# Create a table with kableExtra
+kbl(exp_v_life_mean, 
+    col.names = c("Health Expenditure Group", "Mean Life Expectancy (Years)"), 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    align = "cc") %>% #center entries
+  column_spec(1, width = "3cm") %>%  # Adjust the width of the first column
+  column_spec(2, width = "4cm") %>%  # Adjust the width of the remaining columns
+  kable_styling(latex_options = c("striped", "HOLD_position", "full_width = FALSE"))
+
+
+```
+
+
+\newpage 
+
+## Figure 2. How Out-of-Pocket Healthcare Expenditure Impacts Mortality Ratio
+```{r v2.1, echo=FALSE}
+#make first scatterplot
+plot1 = ggplot(subset_wd, aes(x = `Health_expenditure_%`, y = Infant_Mortality_Ratio)) +
+  geom_point(shape = 21, color = "pink", fill = "blue") + #add colors
+  geom_smooth(method = "lm", formula = y~x, se = FALSE, #add lm trend line
+              color = "brown", linetype = "twodash") +
+      #add labels
+      labs(
+       x = "Health Expenditure %",
+       y = "Infant Mortality Ratio")
+#make second scatterplot
+plot2 = ggplot(subset_wd, aes(x = `Health_expenditure_%`, y = Maternal_Mortality_Ratio)) +
+  geom_point(shape = 21, color = "pink", fill = "blue") +
+  geom_smooth(method = "lm", formula = y~x, se = FALSE,
+              color = "brown", linetype = "twodash") +
+      labs(
+       x = "Health Expenditure %",
+       y = "Maternal Mortality Ratio")
+
+
+grid.arrange(plot1, plot2, ncol = 2) #plot both scatterplots on same grid
+```
+
+## Table 2.  Out-of-Pocket Healthcare Expenditure and Mortality Rates 
+
+```{r tbl 2, echo=FALSE}
+#Summarize the data to create our table
+exp_v_mort <- subset_wd[, c("HHE%_Groups","Health_expenditure_%", "Maternal_Mortality_Ratio", "Infant_Mortality_Ratio")]
+
+exp_v_mort <- exp_v_mort %>%
+  select(`HHE%_Groups`,`Health_expenditure_%`, Maternal_Mortality_Ratio, Infant_Mortality_Ratio)  %>%
+  # Group the data by quartiles of physicians per thousand people
+  group_by(`HHE%_Groups`) %>%
+  # Summarise the data to calculate mean, median, and range of health expenditure percentages
+  summarise(
+    mean.mat = mean(Maternal_Mortality_Ratio, na.rm = TRUE),
+    mean.inf = mean(Infant_Mortality_Ratio, na.rm = TRUE),
+    range.mat = paste(range(Maternal_Mortality_Ratio, na.rm = TRUE), collapse = " - "),
+    range.inf = paste(range(Infant_Mortality_Ratio, na.rm = TRUE), collapse = " - ")
+  )
+
+#use KableExtra to make table
+kbl(exp_v_mort, 
+    col.names = c("Out-of-Pocket Healthcare Expenditure", "Mean Maternal Mortality Ratio", "Mean Infant Mortality Ratio", "Range Maternal Mortality Ratio", "Range Infant Mortality Ratio"), 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    align = "lcccc") %>%
+  column_spec(1, width = "3cm") %>%  # Adjust the width of the first column
+  column_spec(2:5, width = "2cm") %>%  # Adjust the width of the remaining columns
+  kable_styling(latex_options = c("striped", "HOLD_position", "full_width = FALSE"))
+```
+
+
+
+\newpage 
+
+## Figure 3. Out-of-Pocket Healthcare Expenditure and Total Tax Rate Percentage
+```{r v3, echo=FALSE}
+ggplot(na.omit(subset_wd), aes(x = `HHE%_Groups`, fill = `TTR%_Quartiles`)) + #make bar plot
+  geom_bar(position = "stack") + #make stacked
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5), size = 3) +  # Add count numbers with smaller size
+  labs(x = "Health Expenditure %", y = "Count", fill = "Total Tax Rate Percentage Quartile") + #add labels
+  scale_fill_manual(values = c("lavender","mediumpurple", "midnightblue")) + #change colors
+  theme_minimal()
+```
+
+## Table 3. Out-of-Pocket Healthcare Expenditure and Total Tax Rate
+
+```{r t3.2, echo=FALSE}
+#subset data for visualization
+exp_v_tax <- subset_wd[, c("Health_expenditure_%", "HHE%_Groups", "TTR%_Quartiles", "Total_Tax_Rate_%")]
+
+# Order the dataframe by Health_expenditure_% in descending order
+exp_v_tax <- exp_v_tax %>% 
+  arrange(desc(`Health_expenditure_%`))
+
+exp_v_tax <- exp_v_tax %>%
+  select(`HHE%_Groups`, `Total_Tax_Rate_%`)  %>%
+  # Group the data by health expenditure 
+  group_by(`HHE%_Groups`) %>%
+  # Summarise the data to calculate mean, median, and range of health expenditure percentages
+  summarise(
+    mean = mean(`Total_Tax_Rate_%`, na.rm = TRUE),
+    median = median(`Total_Tax_Rate_%`, na.rm = TRUE),
+    range = paste(range(`Total_Tax_Rate_%`, na.rm = TRUE), collapse = " - ")
+  )
+
+#use KableExtra to make table
+kbl(exp_v_tax, 
+    col.names = c("Out-of-Pocket Healthcare Expenditure Range", "Mean Tax Rate", "Median Tax Rate", "Range Tax Rate"), 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    align = "lccc",
+    repeat_header_text = "Table continued on next page") %>%
+  column_spec(1, width = "3cm") %>%  # Adjust the width of the first column
+  column_spec(2:3, width = "2cm") %>%  # Adjust the width of the remaining columns
+  column_spec(4, width = "3cm") %>%  # Adjust the width of the remaining columns
+  kable_styling(latex_options = c("striped", "HOLD_position", "full_width = FALSE"))
+
+```
+
+\newpage 
+
+
+
+## Figure 4. Out-of-Pocket Healthcare Expenditure and Physicians Per Thousand
+```{r v4, echo=FALSE}
+#make bar plot
+ggplot(subset_wd, aes(x = `HHE%_Groups`, fill = PPT_Quartiles)) + #make bar plot
+  geom_bar(stat = "count") + #based on count
+  scale_fill_manual(values = c("orangered4", "orangered2", "orange")) + #fill colors
+  labs(
+       x = "Health Expenditure Groups",
+       y = "Count",
+       fill = "Physicians Per Thousand") +
+  geom_text(aes(label = ..count..), stat = "count", position = position_stack(vjust = 0.5), size = 2) +  # Add count numbers
+  theme(legend.position = "right",  # Move legend to the right
+        legend.title = element_text(face = "bold"),  # Add legend title
+        legend.text = element_text( size = 10))  # Adjust legend text size
+```
+
+## Table 4. Out-of-Pocket Healthcare Expenditure and Physicians Per Thousand
+```{r t4, echo=FALSE}
+#Summarize the data to create our table
+exp_v_phys <- subset_wd[, c("Country", "HHE%_Groups", "Health_expenditure_%", "PPT_Quartiles", "Physicians_per_Thousand")]
+
+exp_v_phys <- exp_v_phys %>%
+  select(`Health_expenditure_%`, PPT_Quartiles)  %>%
+  # Group the data by quartiles of physicians per thousand people
+  group_by(PPT_Quartiles) %>%
+  # Summarise the data to calculate mean, median, and range of health expenditure percentages
+  summarise(
+    mean = mean(`Health_expenditure_%`, na.rm = TRUE),
+    median = median(`Health_expenditure_%`, na.rm = TRUE),
+    range = paste(range(`Health_expenditure_%`, na.rm = TRUE), collapse = " - ")
+  )
+
+#use KableExtra to make table
+kbl(exp_v_phys, 
+    col.names = c("Physicians Per 1,000 Quartiles", "Mean Out-of-Pocket Healthcare Expenditure (%)", "Median Out-of-Pocket Healthcare Expenditure (%)", "Range Out-of-Pocket Healthcare Expenditure (%)"), 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    align = "lccc",
+    repeat_header_text = "Table continued on next page") %>%
+  column_spec(1, width = "3cm") %>%  # Adjust the width of the first column
+  column_spec(2:4, width = "4cm") %>%  # Adjust the width of the remaining columns
+  kable_styling(latex_options = c("striped", "HOLD_position", "full_width = FALSE"))
+
+```
+
+\newpage 
+
+
+
+
+## Figure 5. GDP as a Function of Out-of-Pocket Healthcare Expenditure
+```{r v5, echo=FALSE}
+ggplot(subset_wd, aes(x = factor(`HHE%_Groups`, levels = c("Low", "Mid", "High")), y = `GDP_in_$`)) + # make box plot
+  geom_boxplot(width = 0.8, fill = "green") + #fill color
+  scale_y_continuous(labels = scales::label_currency()) +
+  #add labels
+  labs(
+       x = "Out-of-Pocket Health Expenditure",
+       y = "GDP ($)")
+```
+
+## Table 5. Out-of-Pocket Healthcare Expenditure and GDP
+```{r t5, echo=FALSE}
+# Subset the necessary columns from your dataset
+exp_v_gdp <- subset_wd[, c("GDP_in_$", "HHE%_Groups", "Health_expenditure_%")]
+
+# Calculate mean GDP for each group
+exp_v_gdp <- exp_v_gdp %>%
+  group_by(`HHE%_Groups`) %>%
+  reframe(mean_GDP = mean(`GDP_in_$`, na.rm = TRUE),
+          median_GDP = median(`GDP_in_$`, na.rm = TRUE),
+          range_GDP = paste(range(`GDP_in_$`, na.rm = TRUE), collapse = " - ")
+  )
+
+kbl(exp_v_gdp, 
+    col.names = c("Out-of-Pocket Health Expenditure (%)", "Mean GDP ($)", "Median GDP ($)", "Range GDP ($)"), 
+    booktabs = TRUE, 
+    longtable = TRUE,
+    align = "lccc",
+    lines_per_page = 50,  # Adjust the number of rows per page
+    repeat_header_text = "Table continued on next page") %>%
+  column_spec(1, width = "3cm") %>%  # Adjust the width of the first column
+  column_spec(2:3, width = "3cm") %>%  # Adjust the width of the remaining columns
+  column_spec(4, width = "5cm") %>%  # Adjust the width of the remaining columns
+  kable_styling(latex_options = c("striped", "HOLD_position", "full_width = FALSE"))
+
+```
